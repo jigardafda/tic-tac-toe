@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        .row {
+            display: flex;
+        }
+
+        .cell {
+            background-color: green;
+            height: 60px;
+            width: 60px;
+            border: 1px solid red;
+            cursor: pointer;
+            font-size: xx-large;
+            color: white;
+            text-align: center;
+            font-family: fantasy;
+        }
+
+        .cell:hover {
+            background-color: blue;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="row">
+            <div class="cell" id="1">
+
+            </div>
+            <div class="cell" id="2">
+
+            </div>
+            <div class="cell" id="3">
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="cell" id="4">
+
+            </div>
+            <div class="cell" id="5">
+
+            </div>
+            <div class="cell" id="6">
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="cell" id="7">
+
+            </div>
+            <div class="cell" id="8">
+
+            </div>
+            <div class="cell" id="9">
+
+            </div>
+        </div>
+
+        <div>
+            <div id="result">
+
+            </div>
+            <button id="reset">
+                Reset
+            </button>
+        </div>
+    </div>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script>
+        const WIN_COMBINATION = [
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9],
+            [1, 4, 7],
+            [2, 5, 8],
+            [3, 6, 9],
+            [1, 5, 9],
+            [3, 5, 7]
+        ];
+
+        function checkWin() {
+
+            var grid = $(".cell").map(function(idx, cell) {
+                var id = $(cell).attr("id");
+                var value = $(cell).html().trim();
+                var cellObj = {
+                    id: parseInt(id),
+                    value: value
+                };
+                return cellObj;
+            }).toArray();
+
+
+            const ogrid = grid.filter(cell => cell.value === "O").map(cell => cell.id);
+            const xgrid = grid.filter(cell => cell.value === "X").map(cell => cell.id);
+
+            //console.log("O =>", ogrid)
+            //console.log("X =>", xgrid)
+
+            for (var i = 0; i < WIN_COMBINATION.length; i++) {
+                const wb = WIN_COMBINATION[i];
+                const o = wb.map(n => ogrid.find(m => m === n)).filter(o => o);
+                const x = wb.map(n => xgrid.find(m => m === n)).filter(o => o);
+
+
+                if (x.length === 3) {
+                    return "X";
+                }
+                if (o.length === 3) {
+                    return "O";
+                }
+            }
+
+            if (grid.filter(cell => cell.value).length === 9) {
+                return "Draw";
+            }
+
+
+        }
+
+
+        $(function() { // DOM Ready
+
+            var completed = false;
+            var counter = 0;
+            $(".cell").on("click", function(evt) {
+                if (completed) {
+                    return;
+                }
+
+                if (counter % 2 === 0) {
+                    $(evt.target).html("X");
+                } else {
+                    $(evt.target).html("O");
+                }
+                counter++;
+                var result = checkWin();
+                console.log("result", result)
+                if (result) {
+                    completed = true;
+                    if (result === "Draw") {
+                        $("#result").html("It's a Draw.");
+                    } else {
+                        $("#result").html(result + " Win !!");
+                    }
+
+                }
+            });
+
+
+            $("#reset").on("click", function() {
+                $(".cell").each(function(idx, ele) {
+                    $(ele).html("");
+                });
+                completed = false;
+            });
+        });
+    </script>
+</body>
+
+</html>
